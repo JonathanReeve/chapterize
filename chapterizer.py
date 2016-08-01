@@ -18,15 +18,19 @@ def cli(book, verbose, debug):
 
     logging.info('Now attempting to break the file %s into chapters.' % book)
 
-    readFile(book)
+    bookObj = Book(book)
 
-def readFile(book): 
-    """
-    Reads the book into memory. 
-    """
-    with open(book) as f: 
-        contents = f.read()
-    print(contents[:50])
+class Book(): 
+    def __init__(self, filename): 
+        self.contents = self.readFile(filename)
+
+    def readFile(self, book): 
+        """
+        Reads the book into memory. 
+        """
+        with open(book) as f: 
+            contents = f.read()
+        print(contents[:50])
 
 if __name__ == '__main__':
     cli()
