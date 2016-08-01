@@ -1,5 +1,6 @@
 import click
 import logging
+import re
 
 @click.command()
 @click.argument('book')
@@ -31,6 +32,12 @@ class Book():
         with open(book) as f: 
             contents = f.read()
         print(contents[:50])
+
+    def findChapterHeadings(self): 
+        pat = re.compile('^[Cc]hapter \d+')
+        headings = pat.findall(self.contents)
+        logging.INFO('Headings: %s' % headings) 
+
 
 if __name__ == '__main__':
     cli()
