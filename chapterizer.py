@@ -23,21 +23,31 @@ def cli(book, verbose, debug):
 
 class Book(): 
     def __init__(self, filename): 
-        self.contents = self.readFile(filename)
+        self.filename = filename
+        self.contents = self.getContents()
+        self.lines = self.getLines()
+        self.headings = self.getHeadings()
+        print(self.headings)
 
-    def readFile(self, book): 
+    def getContents(self): 
         """
         Reads the book into memory. 
         """
-        with open(book) as f: 
+        with open(self.filename) as f: 
             contents = f.read()
-        print(contents[:50])
+        return contents
 
-    def findChapterHeadings(self): 
-        pat = re.compile('^[Cc]hapter \d+')
-        headings = pat.findall(self.contents)
-        logging.INFO('Headings: %s' % headings) 
+    def getLines(self): 
+        """ 
+        Breaks the book into lines.
+        """
+        return self.contents.split('\n')
 
+    def getHeadings(self): 
+        pat = re.compile('[Cc]hapter \d+')
+        headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
+        logging.info('Headings: %s' % headings) 
+        return headings
 
 if __name__ == '__main__':
     cli()
