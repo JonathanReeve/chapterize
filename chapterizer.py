@@ -66,21 +66,8 @@ class Book():
         Filters headings out that are too close together, 
         since they probably belong to a table of contents. 
         """
-        lastHeading = len(self.headingLocations) - 1
-        newHeadings = self.headingLocations
-        for i, headingLocation in enumerate(self.headingLocations): 
-            print('lastheading: ', lastHeading)
-            print('i: ', i)
-            if i is not lastHeading: 
-                nextHeadingLocation = self.headingLocations[i+1]
-                delta = nextHeadingLocation - headingLocation
-                if delta < 4: 
-                    # Include only headings that are fewer than 
-                    # four lines apart from the next one. 
-                    index = self.headingLocations.index(headingLocation)
-                    del newHeadings[index]
-                    del newHeadings[index+1]
-        self.headingLocations = newHeadings
+        pairs = zip(self.headingLocations, self.headingLocations[1:]+0)
+        print(pairs)
 
     def getEndLocation(self): 
         """
