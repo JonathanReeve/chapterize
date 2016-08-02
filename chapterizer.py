@@ -13,8 +13,8 @@ def cli(book, nochapters, verbose, debug):
     """ This tool breaks up a plain text book into chapters. 
     It works especially well with Project Gutenberg plain text ebooks.
     This may also be used to strip metatextual text (tables of contents,
-    titles, Project Gutenberg licenses) from a book, to prepare it
-    for text analysis. 
+    headings, Project Gutenberg licenses) from a book, to prepare it
+    for text analysis. Just use the --nochapters option.  
     """
 
     if verbose:
