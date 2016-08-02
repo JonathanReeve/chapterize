@@ -52,7 +52,7 @@ class Book():
         return self.contents.split('\n')
 
     def getHeadings(self): 
-        pat = re.compile('[Cc]hapter \d+', re.IGNORECASE)
+        pat = re.compile('chapter (\d+|(C|I|V|X|L))', re.IGNORECASE)
         headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
         endLocation = self.getEndLocation()
 
