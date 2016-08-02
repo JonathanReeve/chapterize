@@ -27,7 +27,15 @@ class Book():
         self.contents = self.getContents()
         self.lines = self.getLines()
         self.headings = self.getHeadings()
-        print(self.headings)
+        self.headingLocations = [heading[0] for heading in self.headings]
+        headingsPlain = [self.lines[loc] for loc in self.headingLocations]
+        logging.info('Headings: %s' % headingsPlain) 
+        logging.info('Heading locations: %s' % self.headingLocations) 
+        self.chapters = self.getTextBetweenHeadings()
+        # logging.info('Chapters: %s' % self.chapters) 
+        self.endLocation = self.getEndLocation() 
+        self.numChapters = len(self.chapters)
+        self.writeChapters()
 
     def getContents(self): 
         """
@@ -44,10 +52,67 @@ class Book():
         return self.contents.split('\n')
 
     def getHeadings(self): 
-        pat = re.compile('[Cc]hapter \d+')
+        pat = re.compile('[Cc]hapter \d+', re.IGNORECASE)
         headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
-        logging.info('Headings: %s' % headings) 
+        endLocation = self.getEndLocation()
+
+        # Treat the end location as a heading. 
+        headings.append((endLocation, None))
         return headings
+
+    def getEndLocation(self): 
+        """
+        Tries to find where the book ends. 
+        """
+        ends = ["End of the Project Gutenberg EBook", 
+                "End of Project Gutenberg's"]
+        joined = '|'.join(ends) 
+        pat = re.compile(joined, re.IGNORECASE)
+        endLocation = None
+        for line in self.lines: 
+            if pat.match(line) is not None: 
+                endLocation = self.lines.index(line) 
+                self.endLine = self.lines[endLocation] 
+                break
+
+        if endLocation is None: # Can't find the ending. 
+            logging.info("Can't find an ending line. Assuming that the book ends at the end of the text.")
+            endLocation = len(self.lines)-1 # The end
+            self.endLine = 'None' 
+
+        logging.info('End line: %s at line %s' % (self.endLine, endLocation)) 
+        return endLocation
+
+    def getTextBetweenHeadings(self):
+        chapters = []
+        lastHeading = len(self.headingLocations) - 1
+        for i, headingLocation in enumerate(self.headingLocations):
+            if i is not lastHeading: 
+                nextHeadingLocation = self.headingLocations[i+1]
+                chapters.append(self.lines[headingLocation+1:nextHeadingLocation])
+        return chapters
+
+    def zeroPad(self, numbers): 
+        """ 
+        Takes a list of ints and zero-pads them, returning
+        them as a list of strings. 
+        """
+        maxNum = max(numbers) 
+        maxDigits = len(str(maxNum))
+        numberStrs = [str(number).zfill(maxDigits) for number in numbers] 
+        return numberStrs
+
+    def writeChapters(self): 
+        chapterNums = self.zeroPad(range(1, len(self.chapters)+1))
+        logging.debug('Writing chapter headings: %s' % chapterNums)
+        dir = 'chapters'
+        ext = '.txt'
+        for num, chapter in zip(chapterNums, self.chapters):
+            path = dir + '/' + num + ext
+            logging.debug(chapter)
+            chapter = '\n'.join(chapter)
+            with open(path, 'w') as f: 
+                f.write(chapter)
 
 if __name__ == '__main__':
     cli()
