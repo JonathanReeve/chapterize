@@ -53,7 +53,13 @@ class Book():
         return self.contents.split('\n')
 
     def getHeadings(self): 
-        pat = re.compile('chapter (\d+|(C|I|V|X|L))', re.IGNORECASE)
+        # Ways of enumerating chapters, e.g. 
+        enumeratorsList = ['\d+', # Arabic numberals
+                       '(C|I|V|X|L)', # Roman numerals
+                       'the first', # Chapter the First
+                       'the last'] # Chapter the Last
+        enumerators = '(' + '|'.join(enumeratorsList) + ')'
+        pat = re.compile('chapter '+enumerators, re.IGNORECASE)
         headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
         endLocation = self.getEndLocation()
 
@@ -66,8 +72,19 @@ class Book():
         Filters headings out that are too close together, 
         since they probably belong to a table of contents. 
         """
-        pairs = zip(self.headingLocations, self.headingLocations[1:]+0)
-        print(pairs)
+        pairs = zip(self.headingLocations, self.headingLocations[1:])
+        toBeDeleted = []
+        for pair in pairs: 
+            delta = pair[1] - pair[0]
+            if delta < 4: 
+                if pair[0] not in toBeDeleted: 
+                    toBeDeleted.append(pair[0])
+                if pair[1] not in toBeDeleted: 
+                    toBeDeleted.append(pair[1])
+        print('To be deleted: ', toBeDeleted) 
+        for badLoc in toBeDeleted: 
+            index = self.headingLocations.index(badLoc)
+            del self.headingLocations[index]
 
     def getEndLocation(self): 
         """
