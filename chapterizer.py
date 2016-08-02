@@ -29,12 +29,11 @@ class Book():
         self.headings = self.getHeadings()
         self.headingLocations = [heading[0] for heading in self.headings]
         self.ignoreTOC()
-        headingsPlain = [self.lines[loc] for loc in self.headingLocations]
-        logging.info('Headings: %s' % headingsPlain) 
         logging.info('Heading locations: %s' % self.headingLocations) 
+        headingsPlain = [self.lines[loc] for loc in self.headingLocations]
+        logging.info('Headings: %s' % headingsPlain) 
         self.chapters = self.getTextBetweenHeadings()
         # logging.info('Chapters: %s' % self.chapters) 
-        self.endLocation = self.getEndLocation() 
         self.numChapters = len(self.chapters)
         self.writeChapters()
 
@@ -53,18 +52,36 @@ class Book():
         return self.contents.split('\n')
 
     def getHeadings(self): 
+
+        # Form 1: Chapter I, Chapter 1, Chapter the First, CHAPTER 1
         # Ways of enumerating chapters, e.g. 
-        enumeratorsList = ['\d+', # Arabic numberals
-                       '(C|I|V|X|L)', # Roman numerals
+        arabicNumerals = '\d+'
+        romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})' 
+        enumeratorsList = [arabicNumerals, romanNumerals, 
                        'the first', # Chapter the First
                        'the last'] # Chapter the Last
         enumerators = '(' + '|'.join(enumeratorsList) + ')'
-        pat = re.compile('chapter '+enumerators, re.IGNORECASE)
+        chapterLabelList = ['Chapter', 'CHAPTER']
+        chapterLabels = '(' + '|'.join(chapterLabelList) + ')'
+        form1 = chapterLabels + enumerators
+
+        # Form 2: II. The Mail 
+        enumerators = romanNumerals 
+        separators = '(\. | )'
+        titleCase = '[A-Z][a-z]'
+        form2 = enumerators + separators + titleCase
+
+        pat = re.compile('(%s)|(%s)' % (form1, form2))
+
         headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
-        endLocation = self.getEndLocation()
+
+        self.endLocation = self.getEndLocation()
+
+        print('self.endlocation: ', self.endLocation)
 
         # Treat the end location as a heading. 
-        headings.append((endLocation, None))
+        headings.append((self.endLocation, None))
+
         return headings
 
     def ignoreTOC(self): 
@@ -81,7 +98,7 @@ class Book():
                     toBeDeleted.append(pair[0])
                 if pair[1] not in toBeDeleted: 
                     toBeDeleted.append(pair[1])
-        print('To be deleted: ', toBeDeleted) 
+        logging.debug('TOC locations to be deleted: %s' % toBeDeleted) 
         for badLoc in toBeDeleted: 
             index = self.headingLocations.index(badLoc)
             del self.headingLocations[index]
