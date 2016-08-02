@@ -34,7 +34,8 @@ class Book():
         self.contents = self.getContents()
         self.lines = self.getLines()
         self.headings = self.getHeadings()
-        self.headingLocations = [heading[0] for heading in self.headings]
+        # Alias for historical reasons. FIXME
+        self.headingLocations = self.headings 
         self.ignoreTOC()
         logging.info('Heading locations: %s' % self.headingLocations) 
         headingsPlain = [self.lines[loc] for loc in self.headingLocations]
@@ -87,7 +88,12 @@ class Book():
 
         pat = re.compile('(%s)|(%s)|(%s)' % (form1, form2, form3))
 
-        headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
+        # TODO: can't use .index() since not all lines are unique.
+
+        headings = []
+        for i, line in enumerate(self.lines): 
+            if pat.match(line) is not None: 
+                headings.append(i)
 
         if len(headings) < 3: 
             logging.info('Headings: %s' % headings)
@@ -97,7 +103,7 @@ class Book():
         self.endLocation = self.getEndLocation()
 
         # Treat the end location as a heading. 
-        headings.append((self.endLocation, None))
+        headings.append(self.endLocation)
 
         return headings
 
@@ -126,7 +132,8 @@ class Book():
         """
         ends = ["End of the Project Gutenberg EBook", 
                 "End of Project Gutenberg's", 
-                "\*\*\*END OF THE PROJECT GUTENBERG EBOOK"]
+                "\*\*\*END OF THE PROJECT GUTENBERG EBOOK",
+                "\*\*\* END OF THIS PROJECT GUTENBERG EBOOK"]
         joined = '|'.join(ends) 
         pat = re.compile(joined, re.IGNORECASE)
         endLocation = None
