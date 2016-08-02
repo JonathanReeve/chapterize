@@ -28,6 +28,7 @@ class Book():
         self.lines = self.getLines()
         self.headings = self.getHeadings()
         self.headingLocations = [heading[0] for heading in self.headings]
+        self.ignoreTOC()
         headingsPlain = [self.lines[loc] for loc in self.headingLocations]
         logging.info('Headings: %s' % headingsPlain) 
         logging.info('Heading locations: %s' % self.headingLocations) 
@@ -59,6 +60,27 @@ class Book():
         # Treat the end location as a heading. 
         headings.append((endLocation, None))
         return headings
+
+    def ignoreTOC(self): 
+        """
+        Filters headings out that are too close together, 
+        since they probably belong to a table of contents. 
+        """
+        lastHeading = len(self.headingLocations) - 1
+        newHeadings = self.headingLocations
+        for i, headingLocation in enumerate(self.headingLocations): 
+            print('lastheading: ', lastHeading)
+            print('i: ', i)
+            if i is not lastHeading: 
+                nextHeadingLocation = self.headingLocations[i+1]
+                delta = nextHeadingLocation - headingLocation
+                if delta < 4: 
+                    # Include only headings that are fewer than 
+                    # four lines apart from the next one. 
+                    index = self.headingLocations.index(headingLocation)
+                    del newHeadings[index]
+                    del newHeadings[index+1]
+        self.headingLocations = newHeadings
 
     def getEndLocation(self): 
         """
