@@ -10,11 +10,11 @@ import os
 @click.option('--debug', is_flag=True, help='Turn on debugging messages.')
 @click.version_option('0.1')
 def cli(book, nochapters, verbose, debug):
-    """ This tool breaks up a plain text book into chapters. 
+    """ This tool breaks up a plain text book into chapters.
     It works especially well with Project Gutenberg plain text ebooks.
     This may also be used to strip metatextual text (tables of contents,
     headings, Project Gutenberg licenses) from a book, to prepare it
-    for text analysis. Just use the --nochapters option.  
+    for text analysis. Just use the --nochapters option. 
     """
 
     if verbose:
@@ -27,8 +27,8 @@ def cli(book, nochapters, verbose, debug):
 
     bookObj = Book(book, nochapters)
 
-class Book(): 
-    def __init__(self, filename, nochapters): 
+class Book():
+    def __init__(self, filename, nochapters):
         self.filename = filename
         self.nochapters = nochapters
         self.contents = self.getContents()
