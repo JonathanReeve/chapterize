@@ -47,6 +47,32 @@ This will grab all the text from all the chapters, but will remove titles, chapt
 
 This tool is in a pre-alpha state. There are a lot of types of chapter headings it can’t recognize. That having been said, if it doesn’t work with your text, please open up an issue here and describe the error messages you’re seeing. Please include a URL to the text you’re using. 
 
+## Tested With
+
+Chapterize has been tested successfully with the Project Gutenberg ebooks. Feel free to add yours to this list if you can get it to work with your text. 
+
+* A Study in Scarlet
+* A Tale of Two Cities
+* Anna Karenina
+* Frankenstein
+* Huckleberry Finn
+* Madame Bovary
+* Middlemarch
+* Moby Dick
+* Oliver Twist
+* Pride and Prejudice
+* The Brothers Karamazov
+* The Call of the Wild
+* The Secret Agent
+* The Turn of the Screw
+* The War of the Worlds
+* The Wind in the Willows
+* This Side of Paradise
+* Through the Looking Glass
+* Treasure Island
+* Uncle Tom’s Cabin
+* Wuthering Heights
+
 ## Contributing
 
 Pull requests welcome! Feel free to hack away on it to whatever extent you wish.
