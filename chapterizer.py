@@ -65,17 +65,18 @@ class Book():
         # Ways of enumerating chapters, e.g. 
         arabicNumerals = '\d+'
         romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})' 
-        enumeratorsList = [arabicNumerals, romanNumerals, 
+        numberWords = ['one', 'two', 'three', 'four', 'five', 'six',
+                       'seven', 'eight', 'nine', 'ten', 'eleven', 
+                       'twelve', 'thirteen', 'fourteen', 'fifteen', 
+                       'sixteen', 'seventeen', 'eighteen', 'nineteen',
+                       'twenty', 'thirty', 'forty', 'fifty', 'sixty', 
+                       'seventy', 'eighty', 'ninety']
+        numberWordsPat = '(' + '|'.join(numberWords) + ')'
+        enumeratorsList = [arabicNumerals, romanNumerals, numberWordsPat,
                        'the first', # Chapter the First
-                       'The First', 
-                       'THE FIRST', 
-                       'the last', # Chapter the Last
-                       'The Last', 
-                       'THE LAST']
+                       'the last'] # Chapter the Last
         enumerators = '(' + '|'.join(enumeratorsList) + ')'
-        chapterLabelList = ['Chapter ', 'CHAPTER ']
-        chapterLabels = '(' + '|'.join(chapterLabelList) + ')'
-        form1 = chapterLabels + enumerators
+        form1 = 'chapter ' + enumerators
 
         # Form 2: II. The Mail 
         enumerators = romanNumerals 
@@ -86,13 +87,17 @@ class Book():
         # Form 3: a number on its own, e.g. 8
         form3 = '^\d+$'
 
-        pat = re.compile('(%s)|(%s)|(%s)' % (form1, form2, form3))
+        pat = re.compile(form1, re.IGNORECASE)
+        # This one is case-sensitive. 
+        pat2 = re.compile('(%s|%s)' % (form2, form3)) 
 
         # TODO: can't use .index() since not all lines are unique.
 
         headings = []
         for i, line in enumerate(self.lines): 
             if pat.match(line) is not None: 
+                headings.append(i)
+            if pat2.match(line) is not None: 
                 headings.append(i)
 
         if len(headings) < 3: 
