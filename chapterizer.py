@@ -84,8 +84,12 @@ class Book():
         titleCase = '[A-Z][a-z]'
         form2 = enumerators + separators + titleCase
 
-        # Form 3: a number on its own, e.g. 8
-        form3 = '^\d+$'
+        # Form 3: a number on its own, e.g. 8, VIII
+        arabicNumerals = '^\d+$'
+        romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$' 
+        enumeratorsList = [arabicNumerals, romanNumerals]
+        enumerators = '(' + '|'.join(enumeratorsList) + ')'
+        form3 = enumerators
 
         pat = re.compile(form1, re.IGNORECASE)
         # This one is case-sensitive. 
