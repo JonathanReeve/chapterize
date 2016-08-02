@@ -5,11 +5,16 @@ import os
 
 @click.command()
 @click.argument('book')
+@click.option('--nochapters', is_flag=True, default=False, help="Don't actually split the book into chapters. Just extract the inner text.")
 @click.option('--verbose', is_flag=True, help='Get extra information about what\'s happening behind the scenes.')
 @click.option('--debug', is_flag=True, help='Turn on debugging messages.')
 @click.version_option('0.1')
-def cli(book, verbose, debug):
-    """ This tool breaks up a book into chapters. 
+def cli(book, nochapters, verbose, debug):
+    """ This tool breaks up a plain text book into chapters. 
+    It works especially well with Project Gutenberg plain text ebooks.
+    This may also be used to strip metatextual text (tables of contents,
+    titles, Project Gutenberg licenses) from a book, to prepare it
+    for text analysis. 
     """
 
     if verbose:
@@ -20,11 +25,12 @@ def cli(book, verbose, debug):
 
     logging.info('Now attempting to break the file %s into chapters.' % book)
 
-    bookObj = Book(book)
+    bookObj = Book(book, nochapters)
 
 class Book(): 
-    def __init__(self, filename): 
+    def __init__(self, filename, nochapters): 
         self.filename = filename
+        self.nochapters = nochapters
         self.contents = self.getContents()
         self.lines = self.getLines()
         self.headings = self.getHeadings()
@@ -162,17 +168,31 @@ class Book():
         logging.debug('Writing chapter headings: %s' % chapterNums)
         basename = os.path.basename(self.filename)
         noExt = os.path.splitext(basename)[0]
-        logging.info('Filename: %s' % noExt)
-        outDir = noExt + '-chapters'
-        if not os.path.exists(outDir):
-            os.makedirs(outDir)
-        ext = '.txt'
-        for num, chapter in zip(chapterNums, self.chapters):
-            path = outDir + '/' + num + ext
-            logging.debug(chapter)
-            chapter = '\n'.join(chapter)
+
+        if self.nochapters: 
+            # Join together all the chapters and lines. 
+            text = ""
+            for chapter in self.chapters: 
+                # Stitch together the lines.
+                chapter = '\n'.join(chapter) 
+                # Stitch together the chapters.
+                text += chapter + '\n'
+            ext = '-extracted.txt'
+            path = noExt + ext
             with open(path, 'w') as f: 
-                f.write(chapter)
+                f.write(text)
+        else: 
+            logging.info('Filename: %s' % noExt)
+            outDir = noExt + '-chapters'
+            if not os.path.exists(outDir):
+                os.makedirs(outDir)
+            ext = '.txt'
+            for num, chapter in zip(chapterNums, self.chapters):
+                path = outDir + '/' + num + ext
+                logging.debug(chapter)
+                chapter = '\n'.join(chapter)
+                with open(path, 'w') as f: 
+                    f.write(chapter)
 
 if __name__ == '__main__':
     cli()
