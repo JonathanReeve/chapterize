@@ -1,6 +1,7 @@
 import click
 import logging
 import re
+import os
 
 @click.command()
 @click.argument('book')
@@ -59,9 +60,13 @@ class Book():
         romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})' 
         enumeratorsList = [arabicNumerals, romanNumerals, 
                        'the first', # Chapter the First
-                       'the last'] # Chapter the Last
+                       'The First', 
+                       'THE FIRST', 
+                       'the last', # Chapter the Last
+                       'The Last', 
+                       'THE LAST']
         enumerators = '(' + '|'.join(enumeratorsList) + ')'
-        chapterLabelList = ['Chapter', 'CHAPTER']
+        chapterLabelList = ['Chapter ', 'CHAPTER ']
         chapterLabels = '(' + '|'.join(chapterLabelList) + ')'
         form1 = chapterLabels + enumerators
 
@@ -71,13 +76,19 @@ class Book():
         titleCase = '[A-Z][a-z]'
         form2 = enumerators + separators + titleCase
 
-        pat = re.compile('(%s)|(%s)' % (form1, form2))
+        # Form 3: a number on its own, e.g. 8
+        form3 = '^\d+$'
+
+        pat = re.compile('(%s)|(%s)|(%s)' % (form1, form2, form3))
 
         headings = [(self.lines.index(line), pat.match(line)) for line in self.lines if pat.match(line) is not None] 
 
-        self.endLocation = self.getEndLocation()
+        if len(headings) < 3: 
+            logging.info('Headings: %s' % headings)
+            logging.error("Detected fewer than three chapters. This probably means there's something wrong with chapter detection for this book.")
+            exit()
 
-        print('self.endlocation: ', self.endLocation)
+        self.endLocation = self.getEndLocation()
 
         # Treat the end location as a heading. 
         headings.append((self.endLocation, None))
@@ -108,7 +119,8 @@ class Book():
         Tries to find where the book ends. 
         """
         ends = ["End of the Project Gutenberg EBook", 
-                "End of Project Gutenberg's"]
+                "End of Project Gutenberg's", 
+                "\*\*\*END OF THE PROJECT GUTENBERG EBOOK"]
         joined = '|'.join(ends) 
         pat = re.compile(joined, re.IGNORECASE)
         endLocation = None
@@ -148,10 +160,15 @@ class Book():
     def writeChapters(self): 
         chapterNums = self.zeroPad(range(1, len(self.chapters)+1))
         logging.debug('Writing chapter headings: %s' % chapterNums)
-        dir = 'chapters'
+        basename = os.path.basename(self.filename)
+        noExt = os.path.splitext(basename)[0]
+        logging.info('Filename: %s' % noExt)
+        outDir = noExt + '-chapters'
+        if not os.path.exists(outDir):
+            os.makedirs(outDir)
         ext = '.txt'
         for num, chapter in zip(chapterNums, self.chapters):
-            path = dir + '/' + num + ext
+            path = outDir + '/' + num + ext
             logging.debug(chapter)
             chapter = '\n'.join(chapter)
             with open(path, 'w') as f: 
