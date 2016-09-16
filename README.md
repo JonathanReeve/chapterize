@@ -16,7 +16,7 @@ wget http://www.gutenberg.org/cache/epub/1342/pg1342.txt
 mv pg1342.txt pride-and-prejudice.txt 
 
 # Run Chapterize on it:  
-python chapterize.py pride-and-prejudice.txt
+chapterize pride-and-prejudice.txt
 ```
 
 This should output a directory in the current working directory called `pride-and-prejudice-chapters`, containing files 01.txt through 56.txt. You can then change into that directory, and run text analysis programs, like my [macroetym](https://github.com/JonathanReeve/macro-etym) tool: 
@@ -38,10 +38,26 @@ wget http://www.gutenberg.org/cache/epub/1342/pg1342.txt
 mv pg1342.txt pride-and-prejudice.txt 
 
 # Run Chapterize on it, setting the --nochapters flag:  
-python chapterize.py pride-and-prejudice.txt --nochapters
+chapterize pride-and-prejudice.txt --nochapters
 ```
 
 This will grab all the text from all the chapters, but will remove titles, chapter headings, Project Gutenberg introductions and licenses, and most other metatext. It will write a file called pride-prejudice-extracted.txt to the current working directory. This could be useful if you want to run a kind of bag-of-words analysis on a text, but don’t want to have to do a lot of data cleanup yourself. 
+
+## Installation 
+
+Chapterize is now on PyPi, installable with `pip`. You can install it with: 
+
+```
+sudo pip3 install chapterize
+```
+
+Or, to get the very latest version from GitHub, run: 
+
+```
+git clone https://github.com/JonathanReeve/chapterize.git
+cd chapterize
+sudo pip3 install .
+```
 
 ## State
 
@@ -49,7 +65,7 @@ This tool is in a pre-alpha state. There are a lot of types of chapter headings 
 
 ## Tested With
 
-Chapterize has been tested successfully with the Project Gutenberg ebooks. Feel free to add yours to this list if you can get it to work with your text. 
+Chapterize has been tested successfully with these Project Gutenberg ebooks. Feel free to add yours to this list if you can get it to work with your text. 
 
 * A Study in Scarlet
 * A Tale of Two Cities
