@@ -6,10 +6,11 @@ import os
 @click.command()
 @click.argument('book')
 @click.option('--nochapters', is_flag=True, default=False, help="Don't actually split the book into chapters. Just extract the inner text.")
+@click.option('--stats', is_flag=True, default=False, help="Don't actually split the book into chapters. Just return statistics about the chapters.")
 @click.option('--verbose', is_flag=True, help='Get extra information about what\'s happening behind the scenes.')
 @click.option('--debug', is_flag=True, help='Turn on debugging messages.')
 @click.version_option('0.1')
-def cli(book, nochapters, verbose, debug):
+def cli(book, nochapters, stats, verbose, debug):
     """ This tool breaks up a plain text book into chapters.
     It works especially well with Project Gutenberg plain text ebooks.
     This may also be used to strip metatextual text (tables of contents,
@@ -25,10 +26,10 @@ def cli(book, nochapters, verbose, debug):
 
     logging.info('Now attempting to break the file %s into chapters.' % book)
 
-    bookObj = Book(book, nochapters)
+    bookObj = Book(book, nochapters, stats)
 
 class Book():
-    def __init__(self, filename, nochapters):
+    def __init__(self, filename, nochapters, stats):
         self.filename = filename
         self.nochapters = nochapters
         self.contents = self.getContents()
@@ -43,7 +44,11 @@ class Book():
         self.chapters = self.getTextBetweenHeadings()
         # logging.info('Chapters: %s' % self.chapters) 
         self.numChapters = len(self.chapters)
-        self.writeChapters()
+
+        if stats: 
+            self.getStats()
+        else: 
+            self.writeChapters()
 
     def getContents(self): 
         """
@@ -184,6 +189,15 @@ class Book():
         maxDigits = len(str(maxNum))
         numberStrs = [str(number).zfill(maxDigits) for number in numbers] 
         return numberStrs
+
+    def getStats(self): 
+        """
+        Returns statistics about the chapters, like their length. 
+        """
+        # Check to see if there's a log file. 
+        # If not, make one. 
+        # Write headings to file. 
+        return 
 
     def writeChapters(self): 
         chapterNums = self.zeroPad(range(1, len(self.chapters)+1))
