@@ -15,7 +15,7 @@ def cli(book, nochapters, stats, verbose, debug):
     It works especially well with Project Gutenberg plain text ebooks.
     This may also be used to strip metatextual text (tables of contents,
     headings, Project Gutenberg licenses) from a book, to prepare it
-    for text analysis. Just use the --nochapters option. 
+    for text analysis. Just use the --nochapters option.
     """
 
     if verbose:
@@ -36,9 +36,9 @@ class Book():
         self.lines = self.getLines()
         self.headings = self.getHeadings()
         # Alias for historical reasons. FIXME
-        self.headingLocations = self.headings 
+        self.headingLocations = self.headings
         self.ignoreTOC()
-        logging.info('Heading locations: %s' % self.headingLocations) 
+        logging.info('Heading locations: %s' % self.headingLocations)
         headingsPlain = [self.lines[loc] for loc in self.headingLocations]
         logging.info('Headings: %s' % headingsPlain) 
         self.chapters = self.getTextBetweenHeadings()
@@ -194,10 +194,27 @@ class Book():
         """
         Returns statistics about the chapters, like their length. 
         """
-        # Check to see if there's a log file. 
-        # If not, make one. 
+        # TODO: Check to see if there's a log file. If not, make one. 
         # Write headings to file. 
-        return 
+        numChapters = self.numChapters
+        averageChapterLength = sum([len(chapter) for chapter in self.chapters])/numChapters
+        headings = ['Filename', 'Average chapter length', 'Number of chapters']
+        stats = [self.filename, averageChapterLength, numChapters]
+        stats = [str(val) for val in stats]
+        headings = ','.join(headings) + '\n'
+        statsLog = ','.join(stats) + '\n'
+        logging.info('Log headings: %s' % headings) 
+        logging.info('Log stats: %s' % statsLog) 
+
+        if not os.path.exists('log.txt'): 
+            logging.info('Log file does not exist. Creating it.')
+            with open('log.txt', 'w') as f: 
+                f.write(headings)
+                f.close()
+
+        with open('log.txt', 'a') as f: 
+            f.write(statsLog)
+            f.close()
 
     def writeChapters(self): 
         chapterNums = self.zeroPad(range(1, len(self.chapters)+1))
