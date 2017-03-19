@@ -70,16 +70,21 @@ class Book():
         # Ways of enumerating chapters, e.g.
         arabicNumerals = '\d+'
         romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})'
+        numberWordsByTens = ['twenty', 'thirty', 'forty', 'fifty', 'sixty',
+                              'seventy', 'eighty', 'ninety']
         numberWords = ['one', 'two', 'three', 'four', 'five', 'six',
                        'seven', 'eight', 'nine', 'ten', 'eleven',
                        'twelve', 'thirteen', 'fourteen', 'fifteen',
-                       'sixteen', 'seventeen', 'eighteen', 'nineteen',
-                       'twenty', 'thirty', 'forty', 'fifty', 'sixty',
-                       'seventy', 'eighty', 'ninety']
+                       'sixteen', 'seventeen', 'eighteen', 'nineteen'] + numberWordsByTens
         numberWordsPat = '(' + '|'.join(numberWords) + ')'
-        enumeratorsList = [arabicNumerals, romanNumerals, numberWordsPat,
-                       'the first', # Chapter the First
-                       'the last'] # Chapter the Last
+        ordinalNumberWordsByTens = ['twentieth', 'thirtieth', 'fortieth', 'fiftieth', 
+                                    'sixtieth', 'seventieth', 'eightieth', 'ninetieth'] + \
+                                    numberWordsByTens
+        ordinalNumberWords = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 
+                              'seventh', 'eighth', 'ninth', 'twelfth', 'last'] + \
+                             [numberWord + 'th' for numberWord in numberWords] + ordinalNumberWordsByTens
+        ordinalsPat = '(the )?(' + '|'.join(ordinalNumberWords) + ')'
+        enumeratorsList = [arabicNumerals, romanNumerals, numberWordsPat, ordinalsPat] 
         enumerators = '(' + '|'.join(enumeratorsList) + ')'
         form1 = 'chapter ' + enumerators
 
@@ -96,8 +101,8 @@ class Book():
         form3 = enumerators + separators + titleCase
 
         # Form 4: a number on its own, e.g. 8, VIII
-        arabicNumerals = '^\d+$'
-        romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$'
+        arabicNumerals = '^\d+\.?$'
+        romanNumerals = '(?=[MDCLXVI])M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\.?$'
         enumeratorsList = [arabicNumerals, romanNumerals]
         enumerators = '(' + '|'.join(enumeratorsList) + ')'
         form4 = enumerators
