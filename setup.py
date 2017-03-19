@@ -11,12 +11,12 @@ if ver[0] < 3:
 setup(
     name = 'chapterize',
     packages = ['chapterize'], 
-    version = '0.1.2',
+    version = '0.1.3',
     description = 'A tool for breaking etexts into chapters.',
     author = 'Jonathan Reeve',
     author_email = 'jon.reeve@gmail.com',
     url = 'https://github.com/JonathanReeve/chapterize', 
-    download_url = 'https://github.com/JonathanReeve/chapterize/tarball/0.1.2', 
+    download_url = 'https://github.com/JonathanReeve/chapterize/tarball/0.1.3', 
     install_requires = ['Click'],
     keywords = ['NLP', 'text', 'chapters'],
     entry_points='''
