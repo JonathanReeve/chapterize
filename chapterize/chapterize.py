@@ -54,7 +54,7 @@ class Book():
         """
         Reads the book into memory.
         """
-        with open(self.filename) as f:
+        with open(self.filename, errors='ignore') as f:
             contents = f.read()
         return contents
 
@@ -199,7 +199,7 @@ class Book():
         numChapters = self.numChapters
         averageChapterLength = sum([len(chapter) for chapter in self.chapters])/numChapters
         headings = ['Filename', 'Average chapter length', 'Number of chapters']
-        stats = [self.filename, averageChapterLength, numChapters]
+        stats = ['"' + self.filename + '"', averageChapterLength, numChapters]
         stats = [str(val) for val in stats]
         headings = ','.join(headings) + '\n'
         statsLog = ','.join(stats) + '\n'
