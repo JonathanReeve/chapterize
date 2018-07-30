@@ -10,7 +10,7 @@ It may also be used to strip metatextual text from a book, such as tables of con
 
 ```
 # Grab a copy of Pride and Prejudice from Project Gutenberg: 
-wget http://www.gutenberg.org/cache/epub/1342/pg1342.txt
+wget https://www.gutenberg.org/files/1342/1342-0.txt
 
 # Give it a nicer name. 
 mv pg1342.txt pride-and-prejudice.txt 
